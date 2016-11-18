@@ -9,6 +9,6 @@ class GuMember(models.Model):
     guname = models.CharField(max_length=20)
     gupass = models.CharField(max_length=20)
 
-#这个函数相当于java的toString
+    # 这个函数相当于java的toString
     def __str__(self):
         return 'guname=' + self.guname + ' gupass' + self.gupass

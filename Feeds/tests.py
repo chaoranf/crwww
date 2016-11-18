@@ -6,6 +6,11 @@ from models import GuMember
 
 
 def testdb(request):
-    test1 = GuMember(guname='w3cschool.cc', gupass='asdf')
+    request.encoding = 'utf-8'
+    test1 = GuMember()
+    if 'insertname' in request.GET:
+        test1.guname = request.GET['insertname'].encode('utf-8')
+        test1.gupass = request.GET['insertpass'].encode('utf-8')
     test1.save()
-    return HttpResponse("<p>数据添加成功！</p>")
+    msg = "<p>数据添加成功！" + test1.guname + "</p>";
+    return HttpResponse(msg)

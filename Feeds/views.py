@@ -4,5 +4,5 @@ from django.shortcuts import render
 
 def hello(request):
     context = {}
-    context['hello'] = 'hello world123123123312'
+    context['param_display'] = "it's me"
     return render(request, 'hello.html', context)

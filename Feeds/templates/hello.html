@@ -5,7 +5,12 @@
     <title>chaoranf wellcome u</title>
 </head>
 <body>
-wellcome!!
-<h1>{{ hello }}</h1>
+<h1>{{ param_display }}</h1>
+
+<form action="/testdb/" method="get" >
+    名字 <input type="text" name="insertname"><br/>
+    密码 <input type="text" name="insertpass"><br/>
+    <input type="submit" value="提交">
+</form>
 </body>
 </html>

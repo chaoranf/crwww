@@ -18,6 +18,7 @@ from django.contrib import admin
 from Feeds.views import hello
 from Feeds.tests import testdb
 from Feeds.sheet import *
+from Feeds.apiresponse import api_request
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -25,4 +26,5 @@ urlpatterns = [
     url(r'^testdb/$', testdb),
     url(r'^search/$', search),
     url(r'^search-form/$', search_form),
+    url(r'^api/$', api_request),
 ]
