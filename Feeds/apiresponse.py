@@ -1,5 +1,6 @@
 # encoding: utf-8,这个玩意要加到第一行
 import json
+import traceback
 
 from django.http import *
 from django.views.decorators.csrf import csrf_exempt
@@ -16,9 +17,15 @@ def login_request(request):
         try:
             uid = data['uid']
             finger_value = data['finger']
-            userInfo = UserInfo(jmuid=uid, jmdevice=finger_value)
-            userInfo.save()
-            guresponse.message = 'userInfo save success'
+            var = handleLogic(uid,finger_value)
+            if var == 0:
+                guresponse.message = '合法，与上次指纹一致'
+            elif var == 1:
+                guresponse.message = '与上次指纹不一样'
+            elif var == 2:
+                guresponse.message = '第一次登陆，录入指纹'
+            else:
+                guresponse.message = 'unkonw'
         except:
             print ' happen exception'
             uid = ''
@@ -62,12 +69,12 @@ def gu_request(request):
             print storedValue
             if storedValue == finger_value:
                 guresponse.code = 0
-                guresponse.action = "alert"
+                guresponse.action = "toast"
                 guresponse.message = gustring.validString
                 print 'return legal'
             else:
                 guresponse.code = 0
-                guresponse.action = "alert"
+                guresponse.action = "toast"
                 guresponse.message = gustring.invalidString
                 print 'return ilegal'
 
@@ -75,6 +82,24 @@ def gu_request(request):
     # 字典数据转换成json数据，indent=2表示换行，indent=1表示单行显示
     response = HttpResponse(real_data, content_type="application/json")
     return response
+
+
+def handleLogic(data, fingervalue):
+    try:
+        userInfo = UserInfo.objects.get(jmuid=data)
+    except:
+        userInfo = None
+    if userInfo != None:
+        if fingervalue == userInfo.jmdevice:
+            return 0
+        else:
+            userInfo.jmdevice = fingervalue
+            userInfo.save()
+            return 1
+    else:
+        userInfo = UserInfo(jmuid=data, jmdevice=fingervalue)
+        userInfo.save()
+        return 2
 
 
 def getJsonStr(data):
