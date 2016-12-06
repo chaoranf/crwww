@@ -26,6 +26,6 @@ urlpatterns = [
     url(r'^testdb/$', testdb),
     url(r'^search/$', search),
     url(r'^search-form/$', search_form),
-    url(r'^api/$', apiresponse.api_request),
     url(r'^request/$', apiresponse.gu_request),
+    url(r'^login/$', apiresponse.login_request),
 ]
