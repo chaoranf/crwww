@@ -7,34 +7,52 @@ from django.views.decorators.csrf import csrf_exempt
 from Feeds.models import DeviceInfo, UserInfo
 
 
-# 接收请求数据
+# 登陆时，存储指纹数据
+@csrf_exempt
 def login_request(request):
-    print request.GET.get('asd1')
-    request.encoding = 'utf-8'
-    request.is_secure()
-    return HttpResponse("", content_type="application/json")
+    data = request.COOKIES
+    guresponse = GuResponse(0, 'toast', 'no cookie', '')
+    if data != None and len(data) > 0:
+        try:
+            uid = data['uid']
+            finger_value = data['finger']
+            userInfo = UserInfo(jmuid=uid, jmdevice=finger_value)
+            userInfo.save()
+            guresponse.message = 'userInfo save success'
+        except:
+            print ' happen exception'
+            uid = ''
+            finger_value = ''
+            guresponse.message = 'userInfo save exception'
+
+    real_data = getJsonStr(guresponse)
+    response = HttpResponse(real_data, content_type="application/json")
+    return response
 
 
+# 普通接口请求时，验证指纹
 @csrf_exempt
 def gu_request(request):
     data = request.COOKIES
     print 'request begin ======================'
-    guresponse = GuResponse(0, 'alert', 'no cookie', '')
+    guresponse = GuResponse(0, 'toast', 'no cookie', '')
     gustring = GuString()
     if data != None and len(data) > 0:
         try:
             uid = data['uid']
-            encode_value = data['encode_value']
-            device_info = data['device_info']
+            finger_value = data['finger']
+            finger_dy_value = data['finger_dy']
+            device_info_value = data['device_info']
         except:
             print ' happen exception'
             uid = ''
-            encode_value = ''
-            device_info = ''
+            finger_value = ''
+            finger_dy_value = ''
+            device_info_value = ''
         if uid == None or uid == '':
             # 未登录，存设备信息
-            if encode_value != '':
-                device = DeviceInfo(jmudid=encode_value, jmdevice=device_info)
+            if finger_value != '':
+                device = DeviceInfo(jmudid=finger_value, jmdevice=device_info_value)
                 device.save()
                 print ' save device success'
                 guresponse.message = 'device save success'
@@ -42,13 +60,13 @@ def gu_request(request):
             # 登陆状态，判断md5value
             storedValue = queryDataFromDatabase(uid)
             print storedValue
-            if storedValue == encode_value:
-                guresponse.code = 200
+            if storedValue == finger_value:
+                guresponse.code = 0
                 guresponse.action = "alert"
                 guresponse.message = gustring.validString
                 print 'return legal'
             else:
-                guresponse.code = 200
+                guresponse.code = 0
                 guresponse.action = "alert"
                 guresponse.message = gustring.invalidString
                 print 'return ilegal'
